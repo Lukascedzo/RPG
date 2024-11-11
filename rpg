@@ -1,0 +1,264 @@
+import random
+
+# Global variables
+gems = 0
+event = random.randint(1, 2)
+
+# Knight stats
+knight_health = 200
+knight_damage = 20
+silver_sword = 40
+gold_sword = 60
+
+# Traveler stats
+traveler_health = 150
+traveler_damage = 15
+magic_staff = 40
+magic_staff_explosion = 70
+magic_staff_explosion_chance = 0.3
+
+# Joker stats
+joker_health = 100
+joker_damage = 10
+joker_special = 50
+joker_special_chance = 0.5
+joker_staff = 40
+joker_staff_explosion = 120
+joker_staff_explosion_chance = 0.2
+
+# Monster stats
+monster_health = 120
+monster_damage = 30
+boss_health = 200
+boss_damage = 50
+
+# Status print functions
+def print_status_player():
+    print(f"\nCurrent Status:")
+    print(f"Gems: {gems}")
+
+def print_status_knight():
+    print(f"Knight Health: {knight_health}, Damage: {knight_damage}")
+
+def print_status_traveler():
+    print(f"Traveler Health: {traveler_health}, Damage: {traveler_damage}")
+
+def print_status_joker():
+    print(f"Joker Health: {joker_health}, Damage: {joker_damage}")
+
+def print_status_monster():
+    print(f"Monster Health: {monster_health}, Damage: {monster_damage}")
+
+def print_status_boss():
+    print(f"Boss Health: {boss_health}, Damage: {boss_damage}")
+
+# Game Over and Replay
+def game_over():
+    print("\nGame Over! You have been defeated.")
+    replay = input("Would you like to play again? (yes/no): ").lower()
+    if replay == "yes":
+        start_game()
+    else:
+        print("Thanks for playing!")
+
+def start_game():
+    global knight_health, knight_damage, traveler_health, traveler_damage, joker_health, joker_damage
+    global monster_health, boss_health, gems
+    knight_health, traveler_health, joker_health = 200, 150, 100
+    knight_damage, traveler_damage, joker_damage = 20, 15, 10
+    monster_health, boss_health, gems = 100, 150, 0
+
+    # Character selection
+    print("Pick your character")
+    print("1. Knight")
+    print("2. Traveler")
+    print("3. Joker")
+    
+    choice = int(input("\nEnter the number of your choice: "))
+
+    # Character-specific gameplay
+    if choice == 1:
+        print("\nYou chose Knight!")
+        knight_gameplay()
+    elif choice == 2:
+        print("\nYou chose Traveler!")
+        traveler_gameplay()
+    elif choice == 3:
+        print("\nYou chose Joker!")
+        joker_gameplay()
+    else:
+        print("\nInvalid choice!")
+        start_game()
+
+def knight_gameplay():
+    global knight_health, knight_damage, monster_health, gems
+
+    print_status_player()
+    print_status_knight()
+    print("\nYou found an abandoned house.")
+    print("What will you do?")
+    print("1. Enter the house")
+    print("2. Walk past it")
+
+    house = int(input("Enter the number of your choice: ")) 
+    if house == 1:
+        print("You found a silver sword!")
+        knight_damage = silver_sword
+    else:
+        print("You walked past a great treasure :(")
+    print_status_knight()
+
+    # Monster encounter
+    print("\nA monster attacks you!")
+    monster_encounter("Knight")
+
+def traveler_gameplay():
+    global traveler_health, traveler_damage, monster_health, gems
+
+    print_status_player()
+    print_status_traveler()
+    print("\nYou found an enchanted forest.")
+    print("What will you do?")
+    print("1. Explore the forest")
+    print("2. Walk past it")
+
+    forest = int(input("Enter the number of your choice: ")) 
+    if forest == 1:
+        print("You found a magic staff!")
+        traveler_damage = magic_staff
+    else:
+        print("You walked past a powerful artifact :(")
+    print_status_traveler()
+
+    # Monster encounter
+    print("\nA monster attacks you!")
+    monster_encounter("Traveler")
+
+def joker_gameplay():
+    global joker_health, joker_damage, monster_health, gems
+
+    print_status_player()
+    print_status_joker()
+    print("\nYou found a dark alley.")
+    print("What will you do?")
+    print("1. Enter the alley")
+    print("2. Walk past it")
+
+    alley = int(input("Enter the number of your choice: ")) 
+    if alley == 1:
+        print("You found a joker's staff!")
+        joker_damage = joker_staff
+    else:
+        print("You missed out on a powerful weapon :(")
+    print_status_joker()
+
+    # Monster encounter
+    print("\nA monster attacks you!")
+    monster_encounter("Joker")
+
+# Monster Encounter
+def monster_encounter(character):
+    global knight_health, traveler_health, joker_health, monster_health, gems
+
+    print("What will you do?")
+    print("1. Attack the monster")
+    print("2. Run away")
+
+    action = int(input("Enter the number of your choice: "))
+
+    if action == 1:
+        while monster_health > 0:
+            if character == "Knight":
+                monster_health -= knight_damage
+                knight_health -= monster_damage
+                print("You attacked the monster!")
+                print_status_monster()
+                print_status_knight()
+            elif character == "Traveler":
+                monster_health -= traveler_damage
+                traveler_health -= monster_damage
+                print("You attacked the monster!")
+                print_status_monster()
+                print_status_traveler()
+            elif character == "Joker":
+                if random.random() < joker_special_chance:
+                    print("Joker used a special attack!")
+                    monster_health -= joker_special
+                else:
+                    monster_health -= joker_damage
+                joker_health -= monster_damage
+                print_status_monster()
+                print_status_joker()
+            
+            if monster_health <= 0:
+                print("You defeated the monster!")
+                gems += 50
+                # Health boost for defeating the monster
+                if character == "Knight":
+                    knight_health += 100
+                elif character == "Traveler":
+                    traveler_health += 100
+                elif character == "Joker":
+                    joker_health += 100
+                print("You gained 100 health points!")
+                break
+
+            if knight_health <= 0 or traveler_health <= 0 or joker_health <= 0:
+                game_over()
+                return
+    else:
+        print("You escaped from the monster.")
+
+    final_boss(character)
+
+# Final Boss
+def final_boss(character):
+    global knight_health, traveler_health, joker_health, boss_health
+
+    print("\nYou encounter the Final Boss!")
+    print("What will you do?")
+    print("1. Fight the boss")
+    print("2. Run away")
+    
+    boss_choice = int(input("Enter the number of your choice: "))
+
+    if boss_choice == 1:
+        while boss_health > 0:
+            if character == "Knight":
+                boss_health -= knight_damage
+                knight_health -= boss_damage
+                print("You attacked the boss!")
+                print_status_boss()
+                print_status_knight()
+            elif character == "Traveler":
+                if random.random() < magic_staff_explosion_chance:
+                    print("The Traveler's magic staff exploded!")
+                    boss_health -= magic_staff_explosion
+                else:
+                    boss_health -= traveler_damage
+                traveler_health -= boss_damage
+                print_status_boss()
+                print_status_traveler()
+            elif character == "Joker":
+                if random.random() < joker_staff_explosion_chance:
+                    print("The Joker's staff exploded!")
+                    boss_health -= joker_staff_explosion
+                else:
+                    boss_health -= joker_damage
+                joker_health -= boss_damage
+                print_status_boss()
+                print_status_joker()
+            
+            if boss_health <= 0:
+                print("\nYou defeated the Final Boss and saved the princess!")
+                return
+
+            if knight_health <= 0 or traveler_health <= 0 or joker_health <= 0:
+                game_over()
+                return
+    else:
+        print("You cannot escape the Final Boss!")
+        game_over()
+
+# Start the game
+start_game()
